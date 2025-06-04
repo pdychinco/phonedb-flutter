@@ -7,24 +7,23 @@ final supabaseClientProvider = Provider<SupabaseService>((ref) {
 });
 
 class SupabaseService {
-  static const String _supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  static const String _supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+  static const String _supabaseUrl = 'https://sxelamicmqhqremdnczo.supabase.co';
+  static const String _supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4ZWxhbWljbXFocXJlbWRuY3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjQ2OTUsImV4cCI6MjA1NTc0MDY5NX0.FBJ86qg5qI7cWSTyjs0pgnEOlyYdjhhoGx-8a3HnWHU';
   
-  // Singleton instance
-  static final SupabaseService _instance = SupabaseService._internal();
-  factory SupabaseService() => _instance;
-  SupabaseService._internal();
-
-  // Supabase client
   late final SupabaseClient client;
 
-  // Initialize Supabase once
   Future<void> initialize() async {
-    await Supabase.initialize(
-      url: _supabaseUrl,
-      anonKey: _supabaseAnonKey,
-    );
-    client = Supabase.instance.client;
+    try {
+      await Supabase.initialize(
+        url: _supabaseUrl,
+        anonKey: _supabaseAnonKey,
+      );
+      client = Supabase.instance.client;
+      print('Supabase initialized successfully');
+    } catch (e) {
+      print('Error initializing Supabase: $e');
+      rethrow;
+    }
   }
 
   SupabaseClient get supabaseClient => client;

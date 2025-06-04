@@ -1,53 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phonedb_front/routes.dart';
+import 'package:phonedb_front/src/layouts/base_layout.dart';
+import 'package:phonedb_front/src/services/phone_service.dart';
+import 'package:phonedb_front/src/layouts/card_layout.dart';
+import 'package:intl/intl.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('PhoneDB'),
-        actions: [
-          // Profile button in app bar
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.profile);
-            },
-          ),
-          // Settings button in app bar
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.settings);
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Welcome to PhoneDB'),
-            const SizedBox(height: 20),
-            // Example button to navigate to profile
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.profile);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final phoneService = ref.watch(phoneServiceProvider);
+
+    return BaseLayout(
+      currentRoute: AppRoutes.home,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('PhoneDB'),
+        ),
+        body: FutureBuilder<List<Map<String, dynamic>>>(
+          future: phoneService.getAllPhones(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
+
+            final phones = snapshot.data ?? [];
+
+            if (phones.isEmpty) {
+              return const Center(
+                child: Text('No phones found'),
+              );
+            } 
+
+            return ListView.builder(
+              itemCount: phones.length,
+              itemBuilder: (context, index) {
+                final phone = phones[index];
+                return PriceCard(
+                  brandModel: '${phone['brand']} ${phone['model']}',
+                  carrierName: phone['carrier_name'] ?? 'Unlocked',
+                  currentPrice: phone['current_price']?.toDouble() ?? 0.0,
+                  retailPrice: phone['msrp']?.toDouble() ?? 0.0,
+                  discount: ((phone['msrp']?.toDouble() ?? 0.0) - (phone['current_price']?.toDouble() * 24 ?? 0.0)) / 
+                           (phone['msrp']?.toDouble() ?? 1.0) * 100,
+                  lowestPrice: phone['lowest_price']?.toDouble() ?? 0.0,
+                  lowestEntryDate: DateFormat('yyyy-MM-dd').parse(phone['lowest_entry_date'] ?? DateTime.now().toIso8601String()),
+                  lastUpdated: DateFormat('yyyy-MM-dd').parse(phone['latest_entry_date'] ?? DateTime.now().toIso8601String()),
+                );
               },
-              child: const Text('Go to Profile'),
-            ),
-            const SizedBox(height: 10),
-            // Example button to navigate to settings
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.settings);
-              },
-              child: const Text('Go to Settings'),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
