@@ -16,7 +16,7 @@ class BaseLayout extends StatelessWidget {
     switch (currentRoute) {
       case AppRoutes.home:
         return 0;
-      case AppRoutes.profile:
+      case AppRoutes.phoneList:
         return 1;
       case AppRoutes.settings:
         return 2;

@@ -19,8 +19,8 @@ class BottomNavBar extends StatelessWidget {
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
+          icon: Icon(Icons.phone_iphone),
+          label: 'Phone List',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),
@@ -33,7 +33,7 @@ class BottomNavBar extends StatelessWidget {
             Navigator.pushReplacementNamed(context, AppRoutes.home);
             break;
           case 1:
-            Navigator.pushReplacementNamed(context, AppRoutes.profile);
+            Navigator.pushReplacementNamed(context, AppRoutes.phoneList);
             break;
           case 2:
             Navigator.pushReplacementNamed(context, AppRoutes.settings);

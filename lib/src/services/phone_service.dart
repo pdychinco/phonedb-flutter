@@ -11,7 +11,7 @@ class PhoneService {
 
   PhoneService(this._supabase);
 
-  // Get first 5 phones from the database
+  // Get all phones from the database
   Future<List<Map<String, dynamic>>> getAllPhones() async {
     try {
       final response = await _supabase.supabaseClient
@@ -66,6 +66,38 @@ class PhoneService {
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       print('Error searching phones: $e');
+      return [];
+    }
+  }
+
+  // Get unique brands from the database
+  Future<List<String>> getUniqueBrands() async {
+    try {
+      final response = await _supabase.supabaseClient
+          .from('products')
+          .select('brand')
+          .order('brand');
+      
+      final brands = response.map((item) => item['brand'] as String).toSet().toList();
+      return brands;
+    } catch (e) {
+      print('Error fetching brands: $e');
+      return [];
+    }
+  }
+
+  // Get unique carriers from the database
+  Future<List<String>> getUniqueCarriers() async {
+    try {
+      final response = await _supabase.supabaseClient
+          .from('carrier')
+          .select('name')
+          .order('name');
+      
+      final carriers = response.map((item) => item['name'] as String).toSet().toList();
+      return carriers;
+    } catch (e) {
+      print('Error fetching carriers: $e');
       return [];
     }
   }
